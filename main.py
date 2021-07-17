@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.8
 
 def splita_entrada_em_inteiros(entrada):
     quantidade = map(int, entrada.split())
@@ -34,7 +34,59 @@ def pega_grafo_input(numero_vertices):
     
     return grafo
 
+def pega_vizinhos(grafo, indice):
+    vizinhos = []
+    numero_vertices = len(grafo[0])
 
+    for i in range(0, numero_vertices):
+        if (grafo[indice][i] > 0):
+            vizinhos.append(i)
+    return vizinhos
+
+def mesma_aresta(vertice_a, vertice_b, vertice_c, vertice_d):
+    return (vertice_a == vertice_c and vertice_b == vertice_d) or (vertice_a == vertice_d and vertice_b == vertice_c)
+
+def aresta_processada(vertice_a, vertice_b, caminho):
+    for i in range(0, len(caminho) - 1):
+        if (mesma_aresta(vertice_a, vertice_b, caminho[i], caminho[i+1])):
+            return True
+    return False
+
+pilha = Stack()
+caminhos = []
+
+def caminho_valido(vertice, caminho_atual):
+    return vertice not in caminho_atual or vertice == 0
+
+def busca_profundidade(grafo, vertice, caminho_atual):
+    vizinhos = pega_vizinhos(grafo, vertice)
+
+    caminho_atual.append(vertice)
+    for vizinho in vizinhos:
+        if (
+            caminho_valido(vizinho, caminho_atual) and 
+            not aresta_processada(vertice, vizinho, caminho_atual)
+        ):
+            busca_profundidade(grafo, vizinho, caminho_atual.copy())
+    
+    ultimo = caminho_atual[len(caminho_atual) - 1]
+    if (ultimo == 0 and len(caminho_atual) > 1):
+        caminhos.append(caminho_atual)
+
+def pega_custo_e_caminho_maximo():
+    pass
+    # custo_maximo = 0
+    # caminho_maximo = []
+    # for indice in range(0, len(caminhos)):
+    #     custo_atual = 0
+    #     lista_atual = caminhos[indice]
+    #     for i in range(0, len(lista_atual)):
+    #         pass
 if __name__ == '__main__':
     numero_vertices = int(input())
     grafo = pega_grafo_input(numero_vertices)
+
+    busca_profundidade(grafo, 0, [])
+
+    custo_maximo, caminho_maximo = pega_custo_e_caminho_maximo()
+    print(caminho_maximo)
