@@ -37,8 +37,7 @@ def pega_grafo_input(numero_vertices):
 def pega_vizinhos(grafo, indice):
     vizinhos = []
     numero_vertices = len(grafo[0])
-
-    for i in range(0, numero_vertices):
+    for i in range(0, numero_vertices - 1):
         if (grafo[indice][i] > 0):
             vizinhos.append(i)
     return vizinhos
@@ -52,7 +51,6 @@ def aresta_processada(vertice_a, vertice_b, caminho):
             return True
     return False
 
-pilha = Stack()
 caminhos = []
 
 def caminho_valido(vertice, caminho_atual):
@@ -69,24 +67,41 @@ def busca_profundidade(grafo, vertice, caminho_atual):
         ):
             busca_profundidade(grafo, vizinho, caminho_atual.copy())
     
-    ultimo = caminho_atual[len(caminho_atual) - 1]
-    if (ultimo == 0 and len(caminho_atual) > 1):
+    if (vertice == 0 and len(caminho_atual) > 1):
         caminhos.append(caminho_atual)
 
-def pega_custo_e_caminho_maximo():
-    pass
-    # custo_maximo = 0
-    # caminho_maximo = []
-    # for indice in range(0, len(caminhos)):
-    #     custo_atual = 0
-    #     lista_atual = caminhos[indice]
-    #     for i in range(0, len(lista_atual)):
-    #         pass
+def calcula_custo(caminho, grafo):
+    vertice_atual = 0
+    custo = 0 
+
+    for proximo_vertice in range(1, len(caminho)):
+        custo += grafo[vertice_atual][caminho[proximo_vertice]]
+        vertice_atual = caminho[proximo_vertice]
+
+    return custo
+
+def pega_custo_e_caminho_maximo(grafo):
+    custo_maximo = 0
+    caminho_maximo = []
+    for indice in range(0, len(caminhos)):
+        caminho_atual = caminhos[indice]
+        custo_atual = calcula_custo(caminho_atual, grafo)
+        if (custo_atual > custo_maximo):
+            custo_maximo = custo_atual
+            caminho_maximo = caminho_atual
+
+    caminho_maximo = [str(k + 1) for k in caminho_maximo]
+
+    return custo_maximo, caminho_maximo
+
+
 if __name__ == '__main__':
     numero_vertices = int(input())
     grafo = pega_grafo_input(numero_vertices)
 
     busca_profundidade(grafo, 0, [])
 
-    custo_maximo, caminho_maximo = pega_custo_e_caminho_maximo()
-    print(caminho_maximo)
+    custo_maximo, caminho_maximo = pega_custo_e_caminho_maximo(grafo)
+
+    print(custo_maximo)
+    print(" ".join(caminho_maximo))
