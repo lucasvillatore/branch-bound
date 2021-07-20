@@ -37,7 +37,7 @@ def pega_grafo_input(numero_vertices):
 def pega_vizinhos(grafo, indice):
     vizinhos = []
     numero_vertices = len(grafo[0])
-    for i in range(0, numero_vertices - 1):
+    for i in range(0, numero_vertices):
         if (grafo[indice][i] > 0):
             vizinhos.append(i)
     return vizinhos
@@ -78,26 +78,35 @@ def calcula_custo(caminho, grafo):
     vertice_atual = 0
     custo = 0 
 
-    for proximo_vertice in range(1, len(caminho)):
+    for proximo_vertice in range(0, len(caminho)):
         custo += grafo[vertice_atual][caminho[proximo_vertice]]
         vertice_atual = caminho[proximo_vertice]
+    
+    # print(custo)
 
     return custo
 
 def pega_custo_e_caminho_maximo(grafo):
     custo_maximo = 0
     caminho_maximo = []
+    # exit()
     for indice in range(0, len(caminhos)):
         caminho_atual = caminhos[indice]
+        # print(caminho_atual)
         custo_atual = calcula_custo(caminho_atual, grafo)
         if (custo_atual > custo_maximo):
             custo_maximo = custo_atual
             caminho_maximo = caminho_atual
 
-    caminho_maximo = [str(k + 1) for k in caminho_maximo]
+    caminho_maximo = [str(k) for k in caminho_maximo]
 
     return custo_maximo, caminho_maximo
 
+def mostra_grafo(grafo, numero_vertices):
+    for i in range(0, numero_vertices):
+        for j in range(0, numero_vertices):
+            print(str(grafo[i][j]) + "\t", end="")
+        print("")
 
 if __name__ == '__main__':
     numero_vertices = int(input())
@@ -105,6 +114,7 @@ if __name__ == '__main__':
 
     busca_profundidade(grafo, 0, [])
 
+    # mostra_grafo(grafo, numero_vertices)
     custo_maximo, caminho_maximo = pega_custo_e_caminho_maximo(grafo)
 
     print(custo_maximo)
