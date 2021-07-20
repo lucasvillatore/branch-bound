@@ -42,8 +42,8 @@ def pega_vizinhos(grafo, indice):
             vizinhos.append(i)
     return vizinhos
 
-def mesma_aresta(vertice_a, vertice_b, vertice_c, vertice_d):
-    return (vertice_a == vertice_c and vertice_b == vertice_d) or (vertice_a == vertice_d and vertice_b == vertice_c)
+def mesma_aresta(v1, v2, v3, v4):
+    return ((v1,v2) == (v3,v4) or (v1, v2) == (v4, v3))
 
 def aresta_processada(vertice_a, vertice_b, caminho):
     for i in range(0, len(caminho) - 1):
@@ -82,17 +82,13 @@ def calcula_custo(caminho, grafo):
         custo += grafo[vertice_atual][caminho[proximo_vertice]]
         vertice_atual = caminho[proximo_vertice]
     
-    # print(custo)
-
     return custo
 
 def pega_custo_e_caminho_maximo(grafo):
     custo_maximo = 0
     caminho_maximo = []
-    # exit()
     for indice in range(0, len(caminhos)):
         caminho_atual = caminhos[indice]
-        # print(caminho_atual)
         custo_atual = calcula_custo(caminho_atual, grafo)
         if (custo_atual > custo_maximo):
             custo_maximo = custo_atual
