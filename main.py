@@ -98,7 +98,7 @@ def pega_custo_e_caminho_maximo(grafo):
             custo_maximo = custo_atual
             caminho_maximo = caminho_atual
 
-    caminho_maximo = [str(k) for k in caminho_maximo]
+    caminho_maximo = [str(k + 1) for k in caminho_maximo]
 
     return custo_maximo, caminho_maximo
 
