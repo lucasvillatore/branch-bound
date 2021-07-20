@@ -43,7 +43,7 @@ def pega_vizinhos(grafo, indice):
     return vizinhos
 
 def mesma_aresta(v1, v2, v3, v4):
-    return ((v1,v2) == (v3,v4) or (v1, v2) == (v4, v3))
+    return {v1,v2} == {v3,v4}
 
 def aresta_processada(vertice_a, vertice_b, caminho):
     for i in range(0, len(caminho) - 1):
