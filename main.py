@@ -56,6 +56,9 @@ caminhos = []
 def caminho_valido(vertice, caminho_atual):
     return vertice not in caminho_atual or vertice == 0
 
+def caminho_finalizado(caminho_atual):
+    return caminho_atual.count(0) > 1
+
 def busca_profundidade(grafo, vertice, caminho_atual):
     vizinhos = pega_vizinhos(grafo, vertice)
 
@@ -63,7 +66,8 @@ def busca_profundidade(grafo, vertice, caminho_atual):
     for vizinho in vizinhos:
         if (
             caminho_valido(vizinho, caminho_atual) and 
-            not aresta_processada(vertice, vizinho, caminho_atual)
+            not aresta_processada(vertice, vizinho, caminho_atual) and
+            not caminho_finalizado(caminho_atual)
         ):
             busca_profundidade(grafo, vizinho, caminho_atual.copy())
     
