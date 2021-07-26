@@ -1,29 +1,21 @@
 #!/usr/bin/python3.8
 import sys
 
-poda_arvores_ativa = False
+caminhos = []
 
-def splita_entrada_em_inteiros(entrada):
-    quantidade = map(int, entrada.split())
-    quantidade_em_inteiros = list(quantidade) 
+def splita_entrada_em_inteiros(entrada: str):
+    return [0] + [int(x) for x in entrada.split()]
 
-    quantidade_em_inteiros.insert(0, 0) 
-    
-    return quantidade_em_inteiros
+def deixa_lista_mesmo_tamanho(quantidade: int, lista: list):
+    return [0] * quantidade + lista
 
-def deixa_lista_mesmo_tamanho(index, quantidade):
-    for i in range(0, index):
-        quantidade.insert(0, 0)    
-
-    return quantidade
-
-def pega_grafo_input(numero_vertices):
+def pega_grafo_input(numero_vertices: int):
     grafo = []
     for index in range(0, numero_vertices - 1):
         quantidade = deixa_lista_mesmo_tamanho(index, splita_entrada_em_inteiros(input()))
         grafo.append(quantidade)           
     
-    ultimo_elemento = [0 for i in range(0, numero_vertices)]
+    ultimo_elemento = [0] * numero_vertices
     grafo.append(ultimo_elemento)
 
     for i in range(0, numero_vertices):
@@ -32,7 +24,7 @@ def pega_grafo_input(numero_vertices):
     
     return grafo
 
-def pega_vizinhos(grafo, indice):
+def pega_vizinhos(grafo: list, indice: int):
     vizinhos = []
     numero_vertices = len(grafo[0])
     for i in range(0, numero_vertices):
@@ -40,40 +32,35 @@ def pega_vizinhos(grafo, indice):
             vizinhos.append(i)
     return vizinhos
 
-def mesma_aresta(v1, v2, v3, v4):
+def mesma_aresta(v1: int , v2: int, v3: int, v4: int):
     return v1 == v3 and v2 == v4
 
-def aresta_processada(vertice_a, vertice_b, caminho):
-    for i in range(0, len(caminho) - 1):
-        if (mesma_aresta(vertice_a, vertice_b, caminho[i], caminho[i+1])):
+def aresta_processada(vertice_a: int, vertice_b: int, caminho: int):
+    return any(
+        mesma_aresta(vertice_a, vertice_b, c1, c2)
+        for c1, c2
+        in zip(caminho[:-1], caminho[1:])
+    )
+
+def caminho_valido(vertice: int, caminho_atual: list):
+    return vertice not in caminho_atual or vertice == 0
+
+def caminho_finalizado(caminho_atual: list):
+    return caminho_atual.count(0) > 1
+
+
+def existe_caminho_ate_raiz(grafo:list , vertice: int, visitados:list):
+    if (vertice == 0):
+        return True
+    vizinhos = pega_vizinhos(grafo, vertice)
+    visitados.append(vertice)
+    for vizinho in vizinhos:
+        if (vizinho not in visitados or vizinho == 0) and existe_caminho_ate_raiz(grafo, vizinho, visitados):
             return True
     return False
 
-caminhos = []
 
-def caminho_valido(vertice, caminho_atual):
-    return vertice not in caminho_atual or vertice == 0
-
-def caminho_finalizado(caminho_atual):
-    return caminho_atual.count(0) > 1
-
-def existe_caminho_ate_raiz(grafo, vertices_visitados, vertice_atual):
-
-    if (vertice_atual == 0):
-        return 1
-
-    vizinhos = pega_vizinhos(grafo, vertice_atual)
-    vertices_visitados.append(vertice_atual)
-    for vizinho in vizinhos:
-
-        if (
-            caminho_valido(vizinho, vertices_visitados) and
-            not aresta_processada(vertice_atual, vizinho, vertices_visitados)
-        ):
-            return existe_caminho_ate_raiz(grafo, vertices_visitados, vizinho)
-    return 0
-
-def busca_profundidade(grafo, vertice, caminho_atual):
+def branch_bound(grafo: list, vertice: int, caminho_atual: list):
     vizinhos = pega_vizinhos(grafo, vertice)
 
     caminho_atual.append(vertice)
@@ -82,14 +69,14 @@ def busca_profundidade(grafo, vertice, caminho_atual):
             caminho_valido(vizinho, caminho_atual) and 
             not aresta_processada(vertice, vizinho, caminho_atual) and
             not caminho_finalizado(caminho_atual)
-            # and existe_caminho_ate_raiz(grafo, caminho_atual.copy(), vertice)
+            # and existe_caminho_ate_raiz(grafo, vertice, caminho_atual.copy())
         ):
-            busca_profundidade(grafo, vizinho, caminho_atual.copy())
+            branch_bound(grafo, vizinho, caminho_atual.copy())
     
     if (vertice == 0 and len(caminho_atual) > 1):
         caminhos.append(caminho_atual)
 
-def calcula_custo(caminho, grafo):
+def calcula_custo(caminho: list, grafo: list):
     vertice_atual = 0
     custo = 0 
 
@@ -99,7 +86,7 @@ def calcula_custo(caminho, grafo):
     
     return custo
 
-def pega_custo_e_caminho_maximo(grafo):
+def pega_custo_e_caminho_maximo(grafo: list):
     custo_maximo = 0
     numero_nos_arvore = 0
     caminho_maximo = []
@@ -115,7 +102,7 @@ def pega_custo_e_caminho_maximo(grafo):
 
     return numero_nos_arvore, custo_maximo, caminho_maximo
 
-def mostra_grafo(grafo, numero_vertices):
+def mostra_grafo(grafo:list, numero_vertices: int):
     for i in range(0, numero_vertices):
         for j in range(0, numero_vertices):
             print(str(grafo[i][j]) + "\t", end="")
@@ -126,10 +113,10 @@ if __name__ == '__main__':
     numero_vertices = int(input())
     grafo = pega_grafo_input(numero_vertices)
 
-    busca_profundidade(grafo, 0, [])
+    branch_bound(grafo, 0, [])
 
     numero_nos_arvore, custo_maximo, caminho_maximo = pega_custo_e_caminho_maximo(grafo)
 
-    print(f'Número de nós na árvore gerada: {numero_nos_arvore}', file=sys.stderr)
+    # print(f'Número de nós na árvore gerada: {numero_nos_arvore}', file=sys.stderr)
     print(custo_maximo)
     print(" ".join(caminho_maximo))

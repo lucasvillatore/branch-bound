@@ -48,23 +48,19 @@ def caminho_valido(vertice: int, caminho_atual: list):
 def caminho_finalizado(caminho_atual: list):
     return caminho_atual.count(0) > 1
 
-def existe_caminho_ate_raiz(grafo: list, vertices_visitados: list, vertice_atual: int):
 
-    if (vertice_atual == 0):
+def existe_caminho_ate_raiz(grafo:list , vertice: int, visitados:list):
+    if (vertice == 0):
         return True
-
-    vizinhos = pega_vizinhos(grafo, vertice_atual)
-    vertices_visitados.append(vertice_atual)
+    vizinhos = pega_vizinhos(grafo, vertice)
+    visitados.append(vertice)
     for vizinho in vizinhos:
-
-        if (
-            not aresta_processada(vertice_atual, vizinho, vertices_visitados)
-            and existe_caminho_ate_raiz(grafo, vertices_visitados, vizinho)
-        ):
+        if (vizinho not in visitados or vizinho == 0) and existe_caminho_ate_raiz(grafo, vizinho, visitados):
             return True
     return False
 
-def busca_profundidade(grafo: list, vertice: int, caminho_atual: list):
+
+def branch_bound(grafo: list, vertice: int, caminho_atual: list):
     vizinhos = pega_vizinhos(grafo, vertice)
 
     caminho_atual.append(vertice)
@@ -73,9 +69,9 @@ def busca_profundidade(grafo: list, vertice: int, caminho_atual: list):
             caminho_valido(vizinho, caminho_atual) and 
             not aresta_processada(vertice, vizinho, caminho_atual) and
             not caminho_finalizado(caminho_atual)
-            and existe_caminho_ate_raiz(grafo, caminho_atual.copy(), vertice)
+            # and existe_caminho_ate_raiz(grafo, vertice, caminho_atual.copy())
         ):
-            busca_profundidade(grafo, vizinho, caminho_atual.copy())
+            branch_bound(grafo, vizinho, caminho_atual.copy())
     
     if (vertice == 0 and len(caminho_atual) > 1):
         caminhos.append(caminho_atual)
@@ -117,10 +113,10 @@ if __name__ == '__main__':
     numero_vertices = int(input())
     grafo = pega_grafo_input(numero_vertices)
 
-    busca_profundidade(grafo, 0, [])
+    branch_bound(grafo, 0, [])
 
     numero_nos_arvore, custo_maximo, caminho_maximo = pega_custo_e_caminho_maximo(grafo)
 
-    print(f'Número de nós na árvore gerada: {numero_nos_arvore}', file=sys.stderr)
+    # print(f'Número de nós na árvore gerada: {numero_nos_arvore}', file=sys.stderr)
     print(custo_maximo)
     print(" ".join(caminho_maximo))
